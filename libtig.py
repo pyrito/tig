@@ -31,6 +31,21 @@ class GitRepository:
             self.config.read(config_path)
 
 
+def default_config():
+    cfg = configparser.ConfigParser()
+
+    cfg["core"] = {
+        "repositoryformatversion": "0",
+        "filemode": "true",
+        "bare": "false",
+        "logallrefupdates": "true",
+        "ignorecase": "true",
+        "precomposeunicode": "true",
+    }
+
+    return cfg
+
+
 def repo_path(repo, *paths):
     return repo.git_path.joinpath(*paths)
 
@@ -49,7 +64,9 @@ def repo_dir(repo, *paths, mkdir=False):
 
 
 def repo_init(path):
-
+    """
+    This function takes a path and initializes a simple tig repository
+    """
     repo = GitRepository(path)
 
     # Make sure that the path doesn't already exist for simplicity
@@ -69,7 +86,9 @@ def repo_init(path):
     with open(repo_path(repo, "HEAD"), "w") as f:
         f.write("ref: refs/heads/main\n")
 
-    # TODO: write the config
+    with open(repo_path(repo, "config"), "w") as f:
+        cfg = default_config()
+        cfg.write(f)
 
     with open(repo_path(repo, "description"), "w") as f:
         f.write("some description\n")
@@ -92,7 +111,15 @@ def create_argparser():
     return argparser
 
 
+def cmd_init(args):
+    repo_init(args.path)
+
+
 def main(argv=sys.argv[1:]):
     argparser = create_argparser()
     args = argparser.parse_args(argv)
-    repo_init("test")
+    match args.command:
+        case "init":
+            cmd_init(args)
+        case _:
+            raise Exception(f"{args.command} is not supported")
