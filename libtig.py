@@ -13,6 +13,34 @@ Simple dummy library to understand how git actually works
 """
 
 
+class GitObject:
+    """
+    Objects can be commits, blobs, tags, and trees
+    """
+
+    def __init__(self, data=None):
+        pass
+
+    def init(self):
+        pass
+
+    def serialize(self):
+        raise Exception("Need to implement")
+
+    def deserialize(self):
+        raise Exception("Need to implement")
+
+
+class GitBlob(GitObject):
+    file_ext = "blob"
+
+    def serialize(self):
+        pass
+
+    def deserialize(self):
+        pass
+
+
 class GitRepository:
 
     workdir: Path = None
